@@ -23,7 +23,7 @@ var add = require('./add.js').default
 console.log(add(1, 2))
 ```
 
-这两段代码在后端Node.js环境是可以运行的，但在前端则运行不了了。我们做工程化非常重要的一件事情就是模块化，就是通过模块化方式组织代码。js代码也有很多模块的组织方案,比如：esm,cjs。在node后端就是cjs即common.js。
+这两段代码在后端Node.js环境是可以运行的，但在前端则运行不了了，因为浏览器中没有exports对象和require方法所以一定会报错。我们做工程化非常重要的一件事情就是模块化，就是通过模块化方式组织代码。js代码也有很多模块的组织方案,比如：esm,cjs。在node后端就是cjs即common.js。
 
 打包之后，各个模块的代码最好不要变化
 
@@ -36,7 +36,9 @@ console.log(add(1, 2))
 console.log(add(1, 2))`
 ```
 
-然后我们加个eval执行一下代码
+我们知道在Node.js打包的时候我们会使用sfs.readfileSync()来读取js文件，这样的话js文件会是一个字符串，所以我们需要加个eval执行一下代码。
+
+注意：如果需要将字符串中的代码运行有两个方法，分别是new Function和eval，而eval的执行效率相对比较高
 
 ```javascript
 eval(`exports.default = function(a, b) { return a + b }`)
@@ -106,15 +108,30 @@ console.log(add(1, 2))`,
         var exports = {};
         (function (exports, code) {
             eval(code)
-        })(exports, '')
+        })(exports, code)
         return exports
     }
     // 执行入口 index.js
     require('index.js')
 })({
-    'index.js': `var add = require('./add.js').default
+    'index.js': `var add = require('add.js').default
 console.log(add(1, 2))`,
     'add.js': `exports.default = function(a, b) { return a + b }`
 })
 ```
+
+webpack的运行原理：收集依赖，ES6转ES5，替换require和exports
+
+
+
+```javascript
+npm init -y
+// babel四兄弟
+yarn add @babel/parser
+yarn add @babel/traverse
+yarn add @babel/core
+yarn add @babel/preset-env
+```
+
+
 
