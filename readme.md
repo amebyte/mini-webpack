@@ -60,3 +60,19 @@ var exports = {};
 console.log(exports.default(1,5)) // 输出6
 ```
 
+模拟实现common.js里的`require`函数
+
+```javascript
+function require(file) {
+    // 导出模块
+    var exports = {};
+    (function (exports, code) {
+        eval(code)
+    })(exports, 'exports.default = function(a, b) { return a + b }')
+    return exports
+}
+
+var add = require('./add.js').default
+console.log(add(1, 2)) // 输出 3
+```
+
