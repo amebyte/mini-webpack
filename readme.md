@@ -76,3 +76,45 @@ var add = require('./add.js').default
 console.log(add(1, 2)) // 输出 3
 ```
 
+继续升级
+
+```javascript
+function require(file) {
+    const code = list[file]
+    // 导出模块
+    var exports = {};
+    (function (exports, code) {
+        eval(code)
+    })(exports, '')
+    return exports
+}
+
+const list = {
+    'index.js': `var add = require('./add.js').default
+console.log(add(1, 2))`,
+    'add.js': `exports.default = function(a, b) { return a + b }`
+}
+```
+
+继续封装，把上述代码继续封装到一个更大的自运行函数当中。
+
+```javascript
+(function (list) {
+    function require(file) {
+        const code = list[file]
+        // 导出模块
+        var exports = {};
+        (function (exports, code) {
+            eval(code)
+        })(exports, '')
+        return exports
+    }
+    // 执行入口 index.js
+    require('index.js')
+})({
+    'index.js': `var add = require('./add.js').default
+console.log(add(1, 2))`,
+    'add.js': `exports.default = function(a, b) { return a + b }`
+})
+```
+
