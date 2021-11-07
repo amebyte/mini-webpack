@@ -122,7 +122,7 @@ console.log(add(1, 2))`,
 
 webpack的运行原理：收集依赖，ES6转ES5，替换require和exports
 
-
+### 功能实现
 
 ```javascript
 npm init -y
