@@ -16,4 +16,28 @@ const babel = require('@babel/core')
 function getModuleInfo(file) {
     // 读取文件
     const body = fs.readFileSync(file, 'utf-8')
+    // 转化抽象语法树
+    const ast = parser.parse(body, {sourceType: 'module'})
+
+    // 节点遍历的过程 节点遍历器 访问者模式
+
+    // 依赖收集
+    const deps = {}
+    traverse(ast, {
+        // visitor
+        ImportDeclaration({ node }) {
+            const dirname = path.dirname(file)
+            const abspath = "./" + path.join(dirname, node.source.value)
+            deps[node.source.value] = abspath
+        }
+    })
+
+    // ES6转成ES5
+    const { code } = babel.transformFromAst(ast, null, {
+        presets: ["@babel/preset-env"]
+    })
+    const moduleInfo = { file, deps, code }
+    return moduleInfo    
 }
+
+getModuleInfo('./es6/index.js')
