@@ -78,7 +78,7 @@ var add = require('./add.js').default
 console.log(add(1, 2)) // 输出 3
 ```
 
-继续升级
+继续升级，将所有模块的文件名和代码字符串整理为一张key-value表就可以根据传入的文件名加载不同的模块了。
 
 ```javascript
 function require(file) {
@@ -120,9 +120,50 @@ console.log(add(1, 2))`,
 })
 ```
 
+真正的webpack生成的bundle.js文件还需要增加模块间的依赖关系，叫做依赖图(Dependency Graph)
+
+类似下面的情况：
+
+```javascript
+{
+    "./src/index.js":{
+        'deps': {'./add.js':'./src/add.js'},
+        'code': '...'
+    },
+        "./src/add.js": {
+            'deps': {...},
+            'code': '...'
+        }
+}
+```
+
 webpack的运行原理：收集依赖，ES6转ES5，替换require和exports
 
 ### 功能实现
+
+我们的目标是将以下两个互相依赖的ES6Module打包为一个可以在浏览器中运行的一个JS文件（bundle.js）
+
+- 处理模块化
+- 多模块合并打包 - 优化网络请求
+
+```javascript
+// /src/add.js
+export default (a, b) => a + b
+```
+
+```javascript
+// /src/index.js
+import add from './add.js'
+console.log(add(1,2))
+```
+
+分析模块
+
+分析模块分为以下三个步骤：
+
+模块的分析相当于对读取的文件代码字符串进行解析。这一步其实和高级语言的编译过程一致。需要将模块解析为抽象语法树AST。我们借助babel/parser来完成。
+
+初始化package文件和安装babel四兄弟
 
 ```javascript
 npm init -y
@@ -133,5 +174,7 @@ yarn add @babel/core
 yarn add @babel/preset-env
 ```
 
-
+- 读取文件
+- 收集依赖
+- 编译与AST解析
 

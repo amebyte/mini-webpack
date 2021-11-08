@@ -1,0 +1,26 @@
+{
+  "name": "mini-webpack",
+  "version": "1.0.0",
+  "description": "首先我们通过一个制作一个大包文件的原型。",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amebyte/mini-webpack.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/amebyte/mini-webpack/issues"
+  },
+  "homepage": "https://github.com/amebyte/mini-webpack#readme",
+  "dependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/parser": "^7.16.2",
+    "@babel/preset-env": "^7.16.0",
+    "@babel/traverse": "^7.16.0"
+  }
+}
