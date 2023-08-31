@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>mini-webpack</title>
+</head>
+
+<body>
+    <script>
+function tokenizer(input) {
+  let tokens = []
+  let type = ''
+  let val = ''
+  // 循环输⼊模板
+  for (let i = 0; i < input.length; i++) {
+    let ch = input[i]
+    if (ch === '<') {
+      push()
+      if (input[i + 1] === '/') {
+        type = 'tagend'
+      } else {
+        type = 'tagstart'
+      }
+    }
+    if (ch === '>') {
+      push()
+      type = 'text'
+      continue
+    } else if (/[\s]/.test(ch)) {
+      // 碰⻅空格夹断⼀下
+      push()
+      type = 'props'
+      continue
+    }
+    val += ch
+  }
+  return tokens
+  function push() {
+    if (val) {
+      if (type === 'tagstart') val = val.slice(1) // <div => div
+      if (type === 'tagend') val = val.slice(2) // </div => div
+      tokens.push({
+        type,
+        val
+      })
+      val = ''
+    }
+  }
+}
+// 解析：template => ast
+// <div>xxx</div>
+function parse(template) {
+  const tokens = tokenizer(template)
+  let cur = 0
+  let ast = {
+    type: 'root',
+    props: [],
+    children: []
+  }
+  while (cur < tokens.length) {
+    ast.children.push(walk())
+  }
+  return ast
+  function walk() {
+    let token = tokens[cur]
+    if (token.type == 'tagstart') {
+      let node = {
+        type: 'element',
+        tag: token.val,
+        props: [],
+        children: []
+      }
+      token = tokens[++cur]
+      while (token.type !== 'tagend') {
+        if (token.type == 'props') {
+          node.props.push(walk())
+        } else {
+          node.children.push(walk())
+        }
+        token = tokens[cur]
+      }
+      cur++
+      return node
+    }
+    if (token.type === 'tagend') {
+      cur++
+      // return token
+    }
+    if (token.type == 'text') {
+      cur++
+      return token
+    }
+    if (token.type === 'props') {
+      cur++
+      const [key, val] = token.val.split('=')
+      return {
+        key,
+        val
+      }
+    }
+  }
+}
+
+let tmpl = `
+<wxs src="./../tools.wxs" module="tools" />
+<view>{{tools.msg}}</view>
+<view>{{tools.bar(tools.FOO)}}</view>
+  `
+ const ast = parse(tmpl)
+ console.log("ast", ast);
+    </script>
+</body>
+</html>

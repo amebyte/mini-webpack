@@ -34,10 +34,11 @@ function getModuleInfo(file) {
 
     // ES6转成ES5
     const { code } = babel.transformFromAst(ast, null, {
-        presets: ["@babel/preset-env"]
+        presets: [['@babel/preset-env', {targets: {"browsers": ["last 2 versions", "safari >= 7"],node: 'current'},"modules": 'commonjs'}]]
     })
     const moduleInfo = { file, deps, code }
     return moduleInfo    
 }
 
-getModuleInfo('./es6/index.js')
+const res = getModuleInfo('./es6/tools.js')
+fs.writeFileSync("bundle.js", res.code);
